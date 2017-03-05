@@ -1,0 +1,11 @@
+{
+  "name": "nix-revealjs",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Simple meta-package for NPM to build reveal.js presentations in a nix-based environment",
+  "author": "Maximilian Bosch <maximilian@mbosch.me>",
+  "license": "MIT",
+  "dependencies": {
+    "generator-reveal": "^1.0"
+  }
+}

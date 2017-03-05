@@ -1,0 +1,47 @@
+#!/bin/sh
+
+set -e
+
+build_dir="$1"
+
+if [[ -z "$build_dir" ]]; then
+  echo -e "\e[31mNo build dir specified!\e[0m"
+  exit 1
+fi
+
+if [[ -d "$build_dir" ]]; then
+  echo -e "\e[31mDirectory $build_dir already in use!\e[0m"
+  exit 1
+fi
+
+current_dir="$PWD"
+
+mkdir -p "$build_dir"
+cd "$build_dir"
+
+# skip default `npm install` and generate nix expressions for the setup instead
+yo reveal --skip-install
+
+echo -e "\e[32mSuccessfully created project structure. Now building Nix expressions for the NPM and Bower packages...\e[0m"
+
+cp "$current_dir/lib/supplements.json" .
+
+node2nix --development -i package.json --supplement-input supplements.json
+bower2nix bower.json bower-generated.nix
+
+echo -e "\e[33mSuccessfully built Nix expressions. Now building bower packages...\e[0m"
+
+reveal_nix_file="$build_dir/reveal-bower.nix"
+replacement=`basename $build_dir`
+
+touch "$reveal_nix_file"
+cat "$current_dir/lib/reveal-bower.nix" | sed -e "s#DIR#$replacement#" > "$reveal_nix_file"
+
+if [[ "$2" -ne "--skip-build" ]]; then
+  # https://github.com/svanderburg/node2nix/issues/29#issuecomment-272200897
+  # tools like the grunt-cli require a local node_modules/ directory, so we need
+  # to create a symlink to the actual $NODE_PATH in the nix-shell
+  nix-shell -A shell --command "ln -s \$NODE_PATH node_modules"
+
+  nix-build reveal-bower.nix --out-link bower_components/
+fi
