@@ -28,7 +28,7 @@ If the user who bootstraps the presentation doesn't use `nix`, he can do the fol
 ```
 git clone git@github.com:Ma27/nix-revealjs
 cd $_
-npm install -g yo generator-reveal
+npm install -g yo generator-reveal bower2nix node2nix
 
 bin/generate /path/to/the/presentation --skip-build
 ```
