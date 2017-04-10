@@ -2,11 +2,14 @@
 , pkgs ? import <nixpkgs> {}
 }:
 
-pkgs.stdenv.mkDerivation {
+let
+  stdenv = pkgs.stdenv;
+  buildBowerComponents = pkgs.buildBowerComponents;
+in stdenv.mkDerivation {
   name = "bower-revealjs-DIR";
   src = DIRPresentation;
 
-  bowerComponents = pkgs.buildBowerComponents {
+  bowerComponents = buildBowerComponents {
     name = "bower-revealjs-bowercmps-DIR";
     generated = ./bower-generated.nix;
     src = DIRPresentation;
